@@ -158,7 +158,7 @@ def write_test_results():
 
 
 if __name__ == "__main__":
-    device = torch.device("cuda:{}".format(opt.gpu_id))
+    device = torch.device("cuda:{}".format(opt.gpu_id) if torch.cuda.is_available() and opt.use_gpu else "cpu")
     opt.create_path()
     print('Experiment name {} \n'.format(os.path.basename(opt.exp_path)))
     for file in ['config.py', 'object_place_dataset.py', 'object_place_net.py', 'train.py']:
