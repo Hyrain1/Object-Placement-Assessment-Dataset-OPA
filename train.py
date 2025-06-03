@@ -168,9 +168,24 @@ if __name__ == "__main__":
     net = ObjectPlaceNet().to(device)
     criterion = torch.nn.CrossEntropyLoss()
 
-    optimizer = torch.optim.Adam(net.parameters(), opt.base_lr)
-    lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(
-        optimizer, milestones=opt.lr_milestones, gamma=opt.lr_gamma)
+    optimizer_type = opt.optimizer if hasattr(opt, "optimizer") else "adam"
+    if optimizer_type.lower() == "sgd":
+        optimizer = torch.optim.SGD(net.parameters(), lr=opt.base_lr, momentum=0.9, weight_decay=5e-4)
+    elif optimizer_type.lower() == "rmsprop":
+        optimizer = torch.optim.RMSprop(net.parameters(), lr=opt.base_lr)
+    else:
+        optimizer = torch.optim.Adam(net.parameters(), lr=opt.base_lr)
+
+    scheduler_type = opt.scheduler if hasattr(opt, "scheduler") else "multistep"
+    # if scheduler_type.lower() == "steplr":
+    #     lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.1)
+    if scheduler_type.lower() == "exponentiallr":
+        lr_scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.95)
+    elif scheduler_type.lower() == "cosine":
+        lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=opt.epochs)
+    else:
+        lr_scheduler = torch.optim.lr_scheduler.MultiStepLR(
+            optimizer, milestones=opt.lr_milestones, gamma=opt.lr_gamma)
 
     train_loader = get_train_dataloader()
 

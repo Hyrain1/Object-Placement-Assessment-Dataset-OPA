@@ -31,11 +31,13 @@ class Config(object):
     # Config
     backbone = 'resnet18'
     gpu_id = 0
+    optimizer = 'adam' # 'adam', 'sgd', 'rmsprop'
+    scheduler = 'multistep' # 'multistep', 'exponentiallr', 'cosine'
 
     without_mask = False
 
     # Save path 
-    prefix = backbone
+    prefix = f'{backbone}_{optimizer}_{scheduler}_epochs{epochs}' # example: resnet18_adam_multistep_epochs25
     if without_mask:
         prefix += '+without_mask'
 
